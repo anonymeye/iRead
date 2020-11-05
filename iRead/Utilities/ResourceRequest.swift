@@ -50,8 +50,8 @@ struct ResourceRequest<ResourceType> where ResourceType: Codable {
     func save(_ resourceToSave:  ResourceType,
               completion: @escaping (SaveResult<ResourceType>) -> Void) {
         do {
-            guard let token = Auth().token else {
-                Auth().logout()
+            guard let token = Authorizator().token else {
+                Authorizator().logout()
                 return
             }
             var urlRequest = URLRequest(url: resourceURL)
@@ -68,7 +68,7 @@ struct ResourceRequest<ResourceType> where ResourceType: Codable {
                 guard httpResponse.statusCode == 200,
                     let jsonData = data else {
                         if httpResponse.statusCode == 401 {
-                            Auth().logout()
+                            Authorizator().logout()
                         }
                         completion(.failure)
                         return

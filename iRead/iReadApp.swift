@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct iReadApp: App {
+    
+    let env = Environment()
+    
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            // LoginView().environmentObject(Environment.mock)
+            LoginView().environmentObject(env)
         }
     }
 }

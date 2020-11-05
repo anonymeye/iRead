@@ -71,8 +71,8 @@ struct BookRequest {
     func update(with updateData: Book, completion: @escaping (SaveResult<Book>) -> Void) {
         
         do {
-            guard let token = Auth().token else {
-                Auth().logout()
+            guard let token = Authorizator().token else {
+                Authorizator().logout()
                 return
             }
             var urlRequest = URLRequest(url: resource)
@@ -91,7 +91,7 @@ struct BookRequest {
                     httpResponse.statusCode == 200,
                     let jsonData = data else {
                         if httpResponse.statusCode == 401 {
-                            Auth().logout()
+                            Authorizator().logout()
                         }
                         completion(.failure)
                         return
@@ -149,8 +149,8 @@ struct BookRequest {
             return
         }
         
-        guard let token = Auth().token else {
-            Auth().logout()
+        guard let token = Authorizator().token else {
+            Authorizator().logout()
             return
         }
         let url = resource.appendingPathComponent("categories").appendingPathComponent("\(categoryID)")

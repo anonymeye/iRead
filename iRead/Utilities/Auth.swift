@@ -12,23 +12,69 @@ enum AuthResult {
     case failure
 }
 
-class Auth {
+// MARK: - Authorizator
+class Authorizator {
+    
     static let defaultsKey = "iRead-API-KEY"
     let defaults = UserDefaults.standard
     
     var token: String? {
         get {
-            return defaults.string(forKey: Auth.defaultsKey)
+            return defaults.string(forKey: Authorizator.defaultsKey)
         }
         set {
-            defaults.setValue(newValue, forKey: Auth.defaultsKey)
+            defaults.setValue(newValue, forKey: Authorizator.defaultsKey)
         }
     }
     
-    func login(
+    typealias AuthHandler = (String, String, @escaping (AuthenticationResult) -> Void) -> Void
+    var _login: AuthHandler
+    
+    init(authenticating: @escaping AuthHandler =  Authenticator.login(username:password:completion:)  ) {
+        self._login = authenticating
+    }
+    
+    func authorize(username: String, password: String, completion: @escaping (AuthResult) -> Void) {
+        _login(username, password) {
+            result in
+            switch result {
+            case .success(let token):
+                self.token = token
+                completion(.success)
+            case .failure:
+                completion(.failure)
+                
+            }
+        }
+    }
+    
+    func logout() {
+        self.token = nil
+    }
+    
+}
+
+extension Authorizator {
+    static let mock = Authorizator { (_, _, callBack) in
+        callBack(.success("dummy token"))
+        // callBack(.failure)
+    }
+}
+
+
+
+// MARK: - Authenticator
+
+enum AuthenticationResult {
+    case success(String)
+    case failure
+}
+
+struct Authenticator {
+   static func login(
         username: String,
         password: String,
-        completion: @escaping (AuthResult) -> Void
+        completion: @escaping (AuthenticationResult) -> Void
     ) {
         let path = "http://localhost:8080/users/login"
         guard let url = URL(string: path) else {
@@ -56,18 +102,12 @@ class Auth {
             
             do {
                 let token = try JSONDecoder().decode(Token.self, from: jsonData)
-                self.token = token.token
-                completion(.success)
+                completion(.success(token.token))
             } catch {
                 completion(.failure)
             }
         }
         
         dataTask.resume()
-    }
-    
-    func logout() {
-        self.token = nil
-        // navigate to login view
     }
 }

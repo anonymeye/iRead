@@ -18,6 +18,8 @@ struct LoginView: View {
         }
     }
     
+    @EnvironmentObject var env: Environment
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 50) {
@@ -40,7 +42,7 @@ struct LoginView: View {
     func login() {
         //1. validate
         //2. login and navigate
-        Auth().login(username: username, password: password) {
+        env.authorizator.authorize(username: username, password: password) {
             result in
             switch result {
             case .success:
@@ -56,6 +58,7 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+//        LoginView(auth: Environment.mock.authorizator)
+        LoginView().environmentObject(Environment.mock)
     }
 }
