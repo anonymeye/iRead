@@ -9,14 +9,18 @@ import Foundation
 
 class Environment: ObservableObject {
     var authorizator: Authorizator
+    var apiService: ApiService
     
-    init(authorizator: Authorizator = Authorizator()) {
+    init(authorizator: Authorizator = Authorizator(),
+         apiService: ApiService = ApiService()) {
         self.authorizator = authorizator
+        self.apiService = apiService
     }
 }
 
 extension Environment {
     static let mock = Environment(
-        authorizator: Authorizator.mock
+        authorizator: Authorizator.mock,
+        apiService: ApiService.mock
     )
 }

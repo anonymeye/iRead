@@ -9,9 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     
-    let books = [Book(id: 0, title: "The Alchemist", authors: "Paulo Coelho", edition: "1nd", read: false, inProgress: true), Book(id: 1, title: "The Alchemist", authors: "Paulo Coelho", edition: "2nd", read: false), Book(id: 2, title: "The Alchemist", authors: "Paulo Coelho", edition: "3nd", read: true)]
+//    let books = [Book(id: 0, title: "The Alchemist", authors: "Paulo Coelho", edition: "1nd", read: false, inProgress: true), Book(id: 1, title: "The Alchemist", authors: "Paulo Coelho", edition: "2nd", read: false), Book(id: 2, title: "The Alchemist", authors: "Paulo Coelho", edition: "3nd", read: true)]
     
-    @State private var bookResources: [Book] = []
+    @State private var books: [Book] = []
+    @EnvironmentObject var env: Environment
     
     var body: some View {
         NavigationView {
@@ -20,29 +21,23 @@ struct ContentView: View {
             }
             .navigationBarTitle("My Library")
             .listStyle(GroupedListStyle())
-            .onAppear(perform: loadData)
+            .onAppear {
+                env.apiService.loadBooks { result in
+                    switch result {
+                    case .success(let books):
+                        self.books = books
+                    case .failure:
+                        print("oops something is wrong")
+                    }
+                }
+            }
         }
     }
     
-     func loadData() {
-        let booksRequest = ResourceRequest<Book>(resourcePath: "books")
-        booksRequest.getAll { bookResult in
-            DispatchQueue.main.async {
-                // @todo: endRefreshing
-            }
-            switch bookResult {
-            case .failure:
-                print("error getting the boook")
-            case .success(let books):
-                    self.bookResources = books
-                    print("books: ", books)
-            }
-        }
-    }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView().environmentObject(Environment.mock)
     }
 }

@@ -14,8 +14,8 @@ struct iReadApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // LoginView().environmentObject(Environment.mock)
-            LoginView().environmentObject(env)
+            LoginView().environmentObject(Environment.mock)
+            // LoginView().environmentObject(env)
         }
     }
 }
